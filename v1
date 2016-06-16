@@ -1,0 +1,52 @@
+#!/usr/bin/python
+
+from mayavi import mlab
+from math import sin, cos, tan, atan, acos, asin, pi, sqrt, atan2
+import numpy as np
+
+
+# Spherical surface for plotting
+MAXBINS = 30
+r = 40
+theta, phi = np.mgrid[0:2*pi:2*MAXBINS*1j, 0:pi:MAXBINS*1j]
+x = r*np.sin(phi)*np.cos(theta)
+y = r*np.sin(phi)*np.sin(theta)
+z = r*np.cos(phi)
+mlab.mesh(x, y, z, color=(1,1,1),opacity=1.0,\
+              representation='surface')
+
+
+# Convert theta, phi to x,y,z coordinates
+def get_spherical_point(theta,phi,r=1.0):
+    x = r*sin(theta)*cos(phi)
+    y = r*sin(theta)*sin(phi)
+    z = r*cos(theta)
+    return x,y,z
+
+# Fibonacci grid points on spherical surface
+def get_points(N):
+    GR = (1+sqrt(5))/2.0
+    data = []
+    for k in np.linspace(-(N-1)/2.0, (N-1)/2.0, N):
+        theta = pi/2.0 - asin(2.0*k/N)
+        t = acos(2.0*k/N)
+        #print theta, t
+        phi = 2.0 * pi * k/GR
+        x,y,z = get_spherical_point(theta,phi,1.0)
+        data.append([x,y,z])
+    data = np.array(data)
+    return data
+
+# Change value of N to get different number of points    
+N = 61
+N = N*1.0
+data = get_points(N)
+
+r = 40.0
+xa =  data[:,0]
+ya =  data[:,1]
+za =  data[:,2]
+mlab.points3d(r*xa, r*ya, r*za, mode='sphere', \
+              scale_mode='none', scale_factor=2, color=(0,0,0)) 
+
+mlab.show()
